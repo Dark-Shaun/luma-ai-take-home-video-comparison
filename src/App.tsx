@@ -11,6 +11,7 @@ import SummaryPage, { type SummaryRow } from './pages/SummaryPage'
 import type { Decision, HistoryEntry, RatingEntry, SessionState, SideMapping, Winner } from './types/evaluation'
 
 const totalPairs = videoPairs.length
+const AUTO_ADVANCE_DELAY_MS = 200
 
 const createSideMappingByPairId = (): Record<number, SideMapping> =>
   Object.fromEntries(
@@ -45,6 +46,7 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [undoToast, setUndoToast] = useState<{ kind: 'success' | 'info'; message: string } | null>(null)
   const [pendingAutoPlay, setPendingAutoPlay] = useState(false)
+  const autoAdvanceTimeoutRef = useRef<number | null>(null)
 
   const leftVideoRef = useRef<HTMLVideoElement>(null)
   const rightVideoRef = useRef<HTMLVideoElement>(null)
@@ -133,6 +135,19 @@ const App = () => {
     preloadRight.src = nextRightSrc
   }, [session.currentIndex, session.sideMappingByPairId, isOnRating])
 
+  const clearAutoAdvanceTimeout = useCallback(() => {
+    if (autoAdvanceTimeoutRef.current !== null) {
+      window.clearTimeout(autoAdvanceTimeoutRef.current)
+      autoAdvanceTimeoutRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      clearAutoAdvanceTimeout()
+    }
+  }, [clearAutoAdvanceTimeout])
+
   const applySessionUpdate = useCallback((updater: (previous: SessionState) => SessionState) => {
     setSession((previous) => updater(previous))
   }, [])
@@ -148,14 +163,18 @@ const App = () => {
   }, [applySessionUpdate])
 
   const handleJumpToPair = useCallback((index: number) => {
+    clearAutoAdvanceTimeout()
     setIsPlaying(false)
+    setPendingAutoPlay(false)
     applySessionUpdate((previous) => ({
       ...previous,
       currentIndex: index,
     }))
-  }, [applySessionUpdate])
+  }, [applySessionUpdate, clearAutoAdvanceTimeout])
 
   const handleToggleAutoAdvance = useCallback(() => {
+    clearAutoAdvanceTimeout()
+    setPendingAutoPlay(false)
     applySessionUpdate((previous) => ({
       ...previous,
       preferences: {
@@ -163,10 +182,12 @@ const App = () => {
         autoAdvance: !previous.preferences.autoAdvance,
       },
     }))
-  }, [applySessionUpdate])
+  }, [applySessionUpdate, clearAutoAdvanceTimeout])
 
   const handlePrevious = useCallback(() => {
+    clearAutoAdvanceTimeout()
     setIsPlaying(false)
+    setPendingAutoPlay(false)
     leftVideoRef.current?.pause()
     rightVideoRef.current?.pause()
     applySessionUpdate((previous) => {
@@ -179,10 +200,12 @@ const App = () => {
         currentIndex: previous.currentIndex - 1,
       }
     })
-  }, [applySessionUpdate])
+  }, [applySessionUpdate, clearAutoAdvanceTimeout])
 
   const handleNext = useCallback(() => {
+    clearAutoAdvanceTimeout()
     setIsPlaying(false)
+    setPendingAutoPlay(false)
     leftVideoRef.current?.pause()
     rightVideoRef.current?.pause()
     applySessionUpdate((previous) => {
@@ -195,14 +218,17 @@ const App = () => {
         currentIndex: previous.currentIndex + 1,
       }
     })
-  }, [applySessionUpdate])
+  }, [applySessionUpdate, clearAutoAdvanceTimeout])
 
   const handleDecision = useCallback(
     (decision: Decision) => {
+      clearAutoAdvanceTimeout()
       setIsPlaying(false)
       setPendingAutoPlay(false)
       leftVideoRef.current?.pause()
       rightVideoRef.current?.pause()
+      const shouldAutoAdvance =
+        session.preferences.autoAdvance && session.currentIndex < totalPairs - 1
       setSession((previous) => {
         const pair = videoPairs[previous.currentIndex]
         const pairSideMapping = previous.sideMappingByPairId[pair.id]
@@ -222,19 +248,9 @@ const App = () => {
           previousIndex: previous.currentIndex,
         }
 
-        const willAdvance =
-          previous.preferences.autoAdvance && previous.currentIndex < totalPairs - 1
-        const nextIndex = willAdvance
-          ? previous.currentIndex + 1
-          : previous.currentIndex
-
-        if (willAdvance) {
-          setTimeout(() => setPendingAutoPlay(true), 0)
-        }
-
         return {
           ...previous,
-          currentIndex: nextIndex,
+          currentIndex: previous.currentIndex,
           ratingsByPairId: {
             ...previous.ratingsByPairId,
             [pair.id]: rating,
@@ -242,12 +258,30 @@ const App = () => {
           history: [...previous.history, historyEntry],
         }
       })
+
+      if (shouldAutoAdvance) {
+        autoAdvanceTimeoutRef.current = window.setTimeout(() => {
+          autoAdvanceTimeoutRef.current = null
+          setSession((previous) => {
+            if (previous.currentIndex >= totalPairs - 1) {
+              return previous
+            }
+            return {
+              ...previous,
+              currentIndex: previous.currentIndex + 1,
+            }
+          })
+          setPendingAutoPlay(true)
+        }, AUTO_ADVANCE_DELAY_MS)
+      }
     },
-    [],
+    [clearAutoAdvanceTimeout, session.currentIndex, session.preferences.autoAdvance],
   )
 
   const handleUndo = useCallback(() => {
+    clearAutoAdvanceTimeout()
     setIsPlaying(false)
+    setPendingAutoPlay(false)
     leftVideoRef.current?.pause()
     rightVideoRef.current?.pause()
     setSession((previous) => {
@@ -283,7 +317,7 @@ const App = () => {
         history: previous.history.filter((_, index) => index !== targetHistoryIndex),
       }
     })
-  }, [])
+  }, [clearAutoAdvanceTimeout])
 
   const handleTogglePlayback = useCallback(() => {
     const left = leftVideoRef.current
@@ -309,12 +343,14 @@ const App = () => {
   }, [isPlaying])
 
   const handleRestart = useCallback(() => {
+    clearAutoAdvanceTimeout()
     clearSessionState()
     setSession(createInitialSession())
     setIsHelpOpen(false)
     setIsPlaying(false)
+    setPendingAutoPlay(false)
     navigate('/')
-  }, [navigate])
+  }, [clearAutoAdvanceTimeout, navigate])
 
   const summaryRows: SummaryRow[] = useMemo(
     () =>
