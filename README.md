@@ -99,11 +99,8 @@ npm run preview
 - Add an optional single-video inspection mode
 - Add backend support for multi-user evaluation jobs and shared results
 
-## Images:
+## Screenshots
 
-Error state when video playback issue:
+Error state when a video fails to load:
 
-<img width="2726" height="1480" alt="image" src="https://github.com/user-attachments/assets/bba9c5ec-6d0d-41bd-bddf-b919b5cb7d8d" />
-
-
-
+<img width="2726" height="1480" alt="Video error state overlay with retry button" src="https://github.com/user-attachments/assets/bba9c5ec-6d0d-41bd-bddf-b919b5cb7d8d" />
