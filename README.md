@@ -100,6 +100,9 @@ npm run preview
 - Add backend support for multi-user evaluation jobs and shared results
 
 ## Images:
+
+Error state when vide playback issue:
+
 <img width="2726" height="1480" alt="image" src="https://github.com/user-attachments/assets/bba9c5ec-6d0d-41bd-bddf-b919b5cb7d8d" />
 
 
