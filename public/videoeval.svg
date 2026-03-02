@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="VideoEval icon">
+  <defs>
+    <linearGradient id="badge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B95FF" />
+      <stop offset="100%" stop-color="#7C86F7" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="52" height="52" rx="12" fill="url(#badge)" />
+  <path
+    d="M23 21h7.2L32 27.3L33.8 21H41l-5.7 22h-6.6L23 21Z"
+    fill="#F8F8FF"
+  />
+</svg>
