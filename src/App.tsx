@@ -114,6 +114,20 @@ const App = () => {
   }, [undoToast])
 
   useEffect(() => {
+    if (location.pathname !== '/summary') {
+      return
+    }
+    if (ratedPairsCount === totalPairs) {
+      return
+    }
+    const toastTimeoutId = window.setTimeout(() => {
+      setUndoToast({ kind: 'info', message: `Complete all ${totalPairs} pairs to view final summary.` })
+    }, 0)
+    navigate('/evaluate', { replace: true })
+    return () => window.clearTimeout(toastTimeoutId)
+  }, [location.pathname, navigate, ratedPairsCount])
+
+  useEffect(() => {
     if (!isOnRating) {
       return
     }
