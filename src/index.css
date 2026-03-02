@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+:root {
+  --font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --border-w: 1px;
+}
+
+[data-theme="dark"] {
+  --bg-main: #141416;
+  --bg-panel: #1C1C1F;
+  --bg-elevated: #242428;
+  --bg-inset: #18181B;
+
+  --border-subtle: #27272A;
+  --border-default: #303034;
+  --border-strong: #3F3F44;
+
+  --text-primary: #F5F5F7;
+  --text-secondary: #BBBBC4;
+  --text-muted: #7E7E8A;
+
+  --interactive: #27272A;
+  --interactive-hover: #303034;
+  --interactive-active: #3F3F44;
+
+  --accent: #818CF8;
+  --accent-hover: #939EFA;
+  --accent-subtle: rgba(129, 140, 248, 0.12);
+  --accent-text: #FAFAFE;
+
+  --success: #34D399;
+  --danger: #F87171;
+  --danger-subtle: rgba(248, 113, 113, 0.12);
+
+  --video-bg: #000000;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  --bg-main: #F4F4F5;
+  --bg-panel: #FAFAFA;
+  --bg-elevated: #EDEDEF;
+  --bg-inset: #E8E8EB;
+
+  --border-subtle: #E4E4E7;
+  --border-default: #D4D4D8;
+  --border-strong: #C0C0C6;
+
+  --text-primary: #18181B;
+  --text-secondary: #6B6B73;
+  --text-muted: #A1A1A8;
+
+  --interactive: #E4E4E7;
+  --interactive-hover: #D8D8DC;
+  --interactive-active: #CCCCD2;
+
+  --accent: #6366F1;
+  --accent-hover: #5558E0;
+  --accent-subtle: rgba(99, 102, 241, 0.08);
+  --accent-text: #FAFAFE;
+
+  --success: #10B981;
+  --danger: #EF4444;
+  --danger-subtle: rgba(239, 68, 68, 0.08);
+
+  --video-bg: #000000;
+  --overlay: rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+html, body, #root {
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-main), 0 0 0 4px var(--accent);
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
