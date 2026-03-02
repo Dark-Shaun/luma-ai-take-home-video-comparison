@@ -96,7 +96,7 @@ const RatingPage = ({
   const ratedCount = Object.keys(ratingsByPairId).length
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex min-h-screen flex-col">
       <Navbar theme={theme} onToggleTheme={onToggleTheme} onOpenHelp={onOpenHelp}>
         <button
           type="button"
